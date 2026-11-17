@@ -12,10 +12,12 @@ create table if not exists products (
   id uuid primary key default gen_random_uuid(),
   name text not null,
   account_type text not null check (account_type in ('Sharing', 'Private')),
+  category text not null default 'Lainnya' check (category in ('Streaming', 'Editing', 'Education', 'Lainnya')),
   price bigint not null check (price >= 0),
   description text,
   image_url text,
   available boolean not null default true,
+  stock int not null default 0 check (stock >= 0),
   sort_order int not null default 0,
   created_at timestamptz not null default now()
 );
@@ -41,13 +43,15 @@ create table if not exists order_proofs (
 -- Pengaturan toko (satu baris saja).
 create table if not exists settings (
   id int primary key default 1 check (id = 1),
-  store_name text not null default 'TOKO HAZZE',
+  store_name text not null default 'Toko Hazze',
   welcome_text text,
   store_description text,
   footer_text text,
   profile_image_url text,
   whatsapp_number text not null default '6280000000000',
-  wa_intro text not null default 'Halo, Toko Hazze! Saya ingin melakukan pemesanan.'
+  wa_intro text not null default 'Halo, Toko Hazze! Saya ingin melakukan pemesanan.',
+  wa_template text,
+  wa_item_template text
 );
 insert into settings (id) values (1) on conflict (id) do nothing;
 

@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex">
-  <title>Admin — TOKO HAZZE</title>
+  <title>Admin — Toko Hazze</title>
   <link rel="stylesheet" href="styles.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
@@ -12,7 +12,7 @@
 </head>
 <body>
   <div class="admin-wrap">
-    <h2 class="title">Admin TOKO HAZZE</h2>
+    <h2 class="title">Admin Toko Hazze</h2>
 
     <!-- Login -->
     <section id="loginView" class="panel" style="max-width:420px;margin:0 auto" hidden>
@@ -51,6 +51,9 @@
           <label>Nama aplikasi<input id="pName" required></label>
           <label>Jenis akun
             <select id="pType"><option>Sharing</option><option>Private</option></select>
+          </label>
+          <label>Kategori
+            <select id="pCategory"><option>Streaming</option><option>Editing</option><option>Education</option><option>Lainnya</option></select>
           </label>
           <label>Harga (Rp)<input type="number" id="pPrice" min="0" required></label>
           <label>Deskripsi (opsional)<textarea id="pDesc" rows="2"></textarea></label>
@@ -91,6 +94,10 @@
         <form id="contactForm">
           <label>Nomor WhatsApp (format 62...)<input id="cNumber" placeholder="6281234567890"></label>
           <label>Kalimat pembuka pesan WhatsApp<textarea id="cIntro" rows="2"></textarea></label>
+          <label>Format pesan<textarea id="cTemplate" rows="9"></textarea></label>
+          <p class="notice">Placeholder: {intro} (kalimat pembuka), {items} (daftar pesanan), {total} (total). Kosongkan untuk format standar. Di WhatsApp, *teks* jadi tebal dan _teks_ jadi miring.</p>
+          <label>Format tiap item<textarea id="cItem" rows="4"></textarea></label>
+          <p class="notice">Placeholder: {no}, {name}, {type} (Sharing/Private), {qty}, {price}, {subtotal}.</p>
           <button class="btn" type="submit">Simpan</button>
         </form>
       </div>

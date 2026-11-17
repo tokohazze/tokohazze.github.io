@@ -59,7 +59,7 @@
       <tr>
         <td><img src="${T.esc(p.image_url || '')}" alt=""></td>
         <td>${T.esc(p.name)}</td>
-        <td>${T.esc(p.account_type)}</td>
+        <td>${T.esc(p.account_type)} · ${T.esc(p.category || 'Lainnya')}</td>
         <td>${T.rupiah(p.price)}</td>
         <td>${p.available ? 'Tersedia' : 'Tidak'} · Stok ${p.stock ?? 0}</td>
         <td class="row-actions">
@@ -86,6 +86,7 @@
       const row = {
         name: $('pName').value.trim(),
         account_type: $('pType').value,
+        category: $('pCategory').value,
         price: Number($('pPrice').value),
         description: $('pDesc').value.trim() || null,
         stock: Math.max(0, Number($('pStock').value) || 0),
@@ -106,6 +107,7 @@
     if (b.dataset.edit) {
       const p = state.products.find((x) => x.id === b.dataset.edit);
       $('productId').value = p.id; $('pName').value = p.name; $('pType').value = p.account_type;
+      $('pCategory').value = p.category || 'Lainnya';
       $('pPrice').value = p.price; $('pDesc').value = p.description || ''; $('pStock').value = p.stock ?? 0;
       $('pAvail').checked = p.available; window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -184,6 +186,7 @@
     $('sName').value = s.store_name || ''; $('sWelcome').value = s.welcome_text || '';
     $('sDesc').value = s.store_description || ''; $('sFooter').value = s.footer_text || '';
     $('cNumber').value = s.whatsapp_number || ''; $('cIntro').value = s.wa_intro || '';
+    $('cTemplate').value = s.wa_template || ''; $('cItem').value = s.wa_item_template || '';
   }
 
   $('websiteForm').addEventListener('submit', async (e) => {
@@ -204,7 +207,12 @@
   $('contactForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const num = $('cNumber').value.replace(/\D/g, '');
-    const { error } = await db.from('settings').update({ whatsapp_number: num, wa_intro: $('cIntro').value }).eq('id', 1);
+    const { error } = await db.from('settings').update({
+      whatsapp_number: num,
+      wa_intro: $('cIntro').value,
+      wa_template: $('cTemplate').value.trim() || null,
+      wa_item_template: $('cItem').value.trim() || null,
+    }).eq('id', 1);
     if (error) return alert('Gagal menyimpan: ' + error.message);
     T.toast('Kontak disimpan'); loadAll();
   });

@@ -3,71 +3,101 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>TOKO HAZZE</title>
+  <title>Toko Hazze</title>
   <link rel="stylesheet" href="styles.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
   <script src="shared.js" defer></script>
 </head>
 <body>
-  <header class="storefront">
-    <div class="canopy"></div>
-    <img id="avatar" class="avatar" alt="Foto profil toko" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=">
-    <div class="sign" id="storeName">TOKO HAZZE</div>
-    <p class="welcome" id="welcome"></p>
-    <nav class="nav">
-      <a href="#katalog">Catalogue</a>
-      <a href="#testimonials">Proof of Trust</a>
-      <a href="#about">About</a>
-    </nav>
+  <header class="topbar">
+    <span class="brand-name" id="brandName">Toko Hazze</span>
+    <button class="iconbtn" id="cartBtn" aria-label="Keranjang">🛒<span class="cart-count" id="cartCount">0</span></button>
   </header>
 
   <main>
+    <section class="home" id="home">
+      <div class="hero">
+        <img id="avatar" class="avatar" alt="Foto profil toko" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=">
+        <p class="eyebrow">✦ SELAMAT DATANG ✦</p>
+        <h1 class="sign" id="storeName">Toko Hazze</h1>
+        <p class="welcome" id="welcome"></p>
+        <div class="chips">
+          <span>Sharing</span>
+          <span>Private</span>
+          <span>Checkout via WhatsApp</span>
+        </div>
+      </div>
+
+      <section class="menu-section">
+        <p class="menu-title">temukan aplikasi favoritmu ✦</p>
+        <nav class="nav">
+          <a class="menu-card" href="#katalog">
+            <span class="num">01</span>
+            <span><b>Catalogue</b><small>Lihat aplikasi dan pesan via WhatsApp</small></span>
+            <span class="arrow">↗</span>
+          </a>
+          <a class="menu-card" href="#testimonials">
+            <span class="num">02</span>
+            <span><b>Proof of Trust</b><small>Bukti dan testimoni pelanggan</small></span>
+            <span class="arrow">↗</span>
+          </a>
+          <a class="menu-card" href="#about">
+            <span class="num">03</span>
+            <span><b>About</b><small>Cerita dan info tentang toko</small></span>
+            <span class="arrow">↗</span>
+          </a>
+        </nav>
+      </section>
+
+      <section class="contact-card" id="contact">
+        <h2>Contact Me</h2>
+        <p>Ada pertanyaan atau mau pesan? Chat langsung lewat WhatsApp.</p>
+        <div class="contact-actions">
+          <button class="btn" id="contactBtn">Chat WhatsApp</button>
+          <a class="btn pink" href="https://x.com/lavenderhaje" target="_blank" rel="noopener">X · @lavenderhaje</a>
+        </div>
+      </section>
+
+      <footer id="footer"></footer>
+    </section>
+
     <section class="page" id="katalog" hidden>
       <button class="btn back-btn" data-home>← Kembali ke menu</button>
-      <h2 class="title">Catalogue</h2>
-      <div id="catalog" class="grid"></div>
+      <p class="eyebrow">✦ CATALOGUE ✦</p>
+      <h2 class="page-title">Pilih aplikasimu.</h2>
+      <div id="catalog"></div>
     </section>
 
     <section class="page" id="testimonials" hidden>
       <button class="btn back-btn" data-home>← Kembali ke menu</button>
-      <h2 class="title">Proof of Trust</h2>
+      <p class="eyebrow">✦ PROOF OF TRUST ✦</p>
+      <h2 class="page-title">Cerita dari pelanggan.</h2>
       <div id="testimonialGallery" class="gallery"></div>
     </section>
 
     <section class="page" id="about" hidden>
       <button class="btn back-btn" data-home>← Kembali ke menu</button>
-      <h2 class="title">About</h2>
-      <div class="panel" id="aboutText" style="white-space: pre-line; font-size: 18px;"></div>
+      <p class="eyebrow">✦ ABOUT ✦</p>
+      <h2 class="page-title">Tentang kami.</h2>
+      <div id="aboutText"></div>
     </section>
 
-    <section class="page" id="contact">
-      <div class="contact">
-        <h2 class="title" style="margin-top:0">Contact Me</h2>
-        <p>Ada pertanyaan atau mau pesan? Langsung chat saja lewat WhatsApp.</p>
-        <button class="btn" id="contactBtn">Chat WhatsApp</button>
+    <section class="page" id="cartPanel" hidden>
+      <button class="btn back-btn" data-home>← Kembali ke menu</button>
+      <p class="eyebrow">✦ KERANJANG ✦</p>
+      <h2 class="page-title">Pesananmu.</h2>
+      <div class="panel">
+        <div id="cartItems"></div>
+        <p class="notice" id="cartEmpty" hidden>Keranjang masih kosong. Pilih aplikasi dari katalog dulu ya.</p>
+        <div class="total" id="cartTotal"></div>
+        <div class="cart-actions">
+          <button class="btn" id="backToCatalog">Kembali ke Katalog</button>
+          <button class="btn pink" id="checkoutBtn">Checkout via WhatsApp</button>
+        </div>
       </div>
     </section>
   </main>
-
-  <footer id="footer"></footer>
-
-  <button class="btn pink cart-fab" id="cartBtn" aria-label="Keranjang">
-    🛒<span class="cart-count" id="cartCount">0</span>
-  </button>
-
-  <section class="page" id="cartPanel" hidden>
-    <div class="panel">
-      <h2 class="title" style="margin-top:0">Keranjang</h2>
-      <div id="cartItems"></div>
-      <div class="total" id="cartTotal"></div>
-      <p class="notice" id="cartEmpty" hidden>Keranjang masih kosong. Pilih aplikasi dari katalog dulu ya.</p>
-      <div style="text-align:right;margin-top:12px;display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">
-        <button class="btn" id="backToCatalog">Kembali ke Katalog</button>
-        <button class="btn pink" id="checkoutBtn">Checkout via WhatsApp</button>
-      </div>
-    </div>
-  </section>
 
   <div class="lightbox" id="lightbox"><img id="lightboxImg" alt=""></div>
 
