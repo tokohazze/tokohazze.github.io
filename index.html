@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TOKO HAZZE</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="shared.js" defer></script>
+</head>
+<body>
+  <header class="storefront">
+    <div class="canopy"></div>
+    <img id="avatar" class="avatar" alt="Foto profil toko" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=">
+    <div class="sign" id="storeName">TOKO HAZZE</div>
+    <p class="welcome" id="welcome"></p>
+    <nav class="nav">
+      <a href="#katalog">Katalog</a>
+      <a href="#testimonials">Testimonials</a>
+      <a href="#order-proof">Order Proof</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="page" id="katalog">
+      <h2 class="title">Katalog</h2>
+      <div id="catalog" class="grid"></div>
+    </section>
+
+    <section class="page" id="testimonials">
+      <h2 class="title">Testimonials</h2>
+      <div id="testimonialGallery" class="gallery"></div>
+    </section>
+
+    <section class="page" id="order-proof">
+      <h2 class="title">Order Proof</h2>
+      <div id="proofGallery" class="gallery"></div>
+    </section>
+
+    <section class="page">
+      <div class="contact">
+        <h2 class="title" style="margin-top:0">Contact Me</h2>
+        <p>Ada pertanyaan atau mau pesan? Langsung chat saja lewat WhatsApp.</p>
+        <button class="btn" id="contactBtn">Chat WhatsApp</button>
+      </div>
+    </section>
+  </main>
+
+  <footer id="footer"></footer>
+
+  <button class="btn pink cart-fab" id="cartBtn" aria-label="Keranjang">
+    🛒<span class="cart-count" id="cartCount">0</span>
+  </button>
+
+  <section class="page" id="cartPanel" hidden>
+    <div class="panel">
+      <h2 class="title" style="margin-top:0">Keranjang</h2>
+      <div id="cartItems"></div>
+      <div class="total" id="cartTotal"></div>
+      <p class="notice" id="cartEmpty" hidden>Keranjang masih kosong. Pilih aplikasi dari katalog dulu ya.</p>
+      <div style="text-align:right;margin-top:12px;display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">
+        <button class="btn" id="backToCatalog">Kembali ke Katalog</button>
+        <button class="btn pink" id="checkoutBtn">Checkout via WhatsApp</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="lightbox" id="lightbox"><img id="lightboxImg" alt=""></div>
+
+  <script src="app.js" defer></script>
+</body>
+</html>

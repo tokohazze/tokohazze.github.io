@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Admin — TOKO HAZZE</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="shared.js" defer></script>
+</head>
+<body>
+  <div class="admin-wrap">
+    <h2 class="title">Admin TOKO HAZZE</h2>
+
+    <!-- Login -->
+    <section id="loginView" class="panel" style="max-width:420px;margin:0 auto" hidden>
+      <form id="loginForm">
+        <label>Email<input type="email" id="email" required></label>
+        <label>Password<input type="password" id="password" required></label>
+        <button class="btn" type="submit" style="width:100%">Masuk</button>
+        <p id="loginMsg" class="notice" hidden></p>
+      </form>
+    </section>
+
+    <!-- Dashboard -->
+    <section id="appView" hidden>
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+        <span id="whoami"></span>
+        <button class="btn pink" id="logoutBtn">Keluar</button>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><b id="statProducts">0</b>Aplikasi</div>
+        <div class="stat"><b id="statTesti">0</b>Testimoni</div>
+        <div class="stat"><b id="statProof">0</b>Order Proof</div>
+      </div>
+
+      <div class="tabs">
+        <button data-tab="catalog" class="active">Manage Catalog</button>
+        <button data-tab="testimonials">Manage Testimonials</button>
+        <button data-tab="proofs">Manage Order Proof</button>
+        <button data-tab="website">Website Settings</button>
+        <button data-tab="contact">Contact Settings</button>
+      </div>
+
+      <!-- Catalog -->
+      <div class="panel tab" id="tab-catalog">
+        <h3>Tambah / edit aplikasi</h3>
+        <form id="productForm">
+          <input type="hidden" id="productId">
+          <label>Nama aplikasi<input id="pName" required></label>
+          <label>Jenis akun
+            <select id="pType"><option>Sharing</option><option>Private</option></select>
+          </label>
+          <label>Harga (Rp)<input type="number" id="pPrice" min="0" required></label>
+          <label>Deskripsi (opsional)<textarea id="pDesc" rows="2"></textarea></label>
+          <label>Urutan<input type="number" id="pOrder" value="0"></label>
+          <label><input type="checkbox" id="pAvail" checked style="width:auto"> Tersedia</label>
+          <label>Foto aplikasi<input type="file" id="pFile" accept="image/*"></label>
+          <button class="btn" type="submit">Simpan</button>
+          <button class="btn" type="button" id="pCancel" style="background:#ddd;box-shadow:none;color:#555">Batal</button>
+        </form>
+        <table style="margin-top:16px">
+          <thead><tr><th>Foto</th><th>Nama</th><th>Akun</th><th>Harga</th><th>Status</th><th></th></tr></thead>
+          <tbody id="productRows"></tbody>
+        </table>
+      </div>
+
+      <!-- Testimonials & proofs share the same gallery manager -->
+      <div class="panel tab" id="tab-testimonials" hidden>
+        <h3>Tambah testimoni</h3>
+        <form data-gallery="testimonials"><input type="file" accept="image/*" required><button class="btn" type="submit">Unggah</button></form>
+        <table style="margin-top:16px"><thead><tr><th>Gambar</th><th>No</th><th>Tampil</th><th>Urutan</th><th></th></tr></thead><tbody id="testiRows"></tbody></table>
+      </div>
+
+      <div class="panel tab" id="tab-proofs" hidden>
+        <h3>Tambah order proof</h3>
+        <form data-gallery="order_proofs"><input type="file" accept="image/*" required><button class="btn" type="submit">Unggah</button></form>
+        <table style="margin-top:16px"><thead><tr><th>Gambar</th><th>No</th><th>Tampil</th><th>Urutan</th><th></th></tr></thead><tbody id="proofRows"></tbody></table>
+      </div>
+
+      <!-- Website settings -->
+      <div class="panel tab" id="tab-website" hidden>
+        <form id="websiteForm">
+          <label>Nama toko<input id="sName"></label>
+          <label>Welcome text<textarea id="sWelcome" rows="2"></textarea></label>
+          <label>Deskripsi toko<textarea id="sDesc" rows="3"></textarea></label>
+          <label>Teks footer<input id="sFooter"></label>
+          <label>Foto profil<input type="file" id="sAvatar" accept="image/*"></label>
+          <button class="btn" type="submit">Simpan</button>
+        </form>
+      </div>
+
+      <!-- Contact settings -->
+      <div class="panel tab" id="tab-contact" hidden>
+        <form id="contactForm">
+          <label>Nomor WhatsApp (format 62...)<input id="cNumber" placeholder="6281234567890"></label>
+          <label>Kalimat pembuka pesan WhatsApp<textarea id="cIntro" rows="2"></textarea></label>
+          <button class="btn" type="submit">Simpan</button>
+        </form>
+      </div>
+    </section>
+  </div>
+  <script src="admin.js" defer></script>
+</body>
+</html>
