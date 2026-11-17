@@ -41,6 +41,21 @@
       </figure>`).join('') : '<div class="empty">Belum ada gambar.</div>';
   }
 
+  // Hanya satu bagian (Katalog / Testimonials / Order Proof) yang tampil sekaligus.
+  const SECTIONS = ['katalog', 'testimonials', 'order-proof'];
+  // Tanpa hash = halaman depan (hanya header dan menu). Dengan hash = satu halaman saja.
+  function showSection(id) {
+    const target = SECTIONS.includes(id) ? id : null;
+    SECTIONS.forEach((s) => { $(s).hidden = s !== target; });
+    $('contact').hidden = !!target;
+    document.querySelectorAll('.nav a').forEach((a) => {
+      a.classList.toggle('active', !!target && a.getAttribute('href') === '#' + target);
+    });
+    $('cartPanel').hidden = true;
+    window.scrollTo({ top: target ? document.querySelector('.nav').offsetTop - 10 : 0, behavior: 'smooth' });
+  }
+  window.addEventListener('hashchange', () => showSection(location.hash.slice(1)));
+
   function cartCount() { return cart.reduce((n, c) => n + c.qty, 0); }
 
   function renderCart() {
@@ -100,6 +115,7 @@
   document.addEventListener('click', (e) => {
     const t = e.target.closest('button, [data-zoom]');
     if (!t) return;
+    if (t.dataset.home !== undefined) return (location.hash = '');
     if (t.dataset.add) return addToCart(t.dataset.add);
     if (t.dataset.inc) { const c = cart.find((x) => x.id === t.dataset.inc); if (c) c.qty++; saveCart(); return renderCart(); }
     if (t.dataset.dec) { const c = cart.find((x) => x.id === t.dataset.dec); if (c) c.qty = Math.max(1, c.qty - 1); saveCart(); return renderCart(); }
@@ -115,7 +131,7 @@
     $('cartPanel').hidden = false; $('cartPanel').scrollIntoView({ behavior: 'smooth' });
   });
   $('backToCatalog').addEventListener('click', () => {
-    $('cartPanel').hidden = true; $('katalog').scrollIntoView({ behavior: 'smooth' });
+    location.hash = '#katalog';
   });
   $('checkoutBtn').addEventListener('click', () => {
     if (!cart.length) return T.toast('Keranjang masih kosong');
@@ -146,7 +162,10 @@
     renderGallery($('testimonialGallery'), t.data || []);
     renderGallery($('proofGallery'), o.data || []);
     renderCart();
+    showSection(location.hash.slice(1));
   }
 
+  // Sebelum data dimuat, sembunyikan semua halaman kecuali header dan menu.
+  SECTIONS.forEach((s) => { $(s).hidden = true; });
   load();
 })();

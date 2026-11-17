@@ -66,6 +66,8 @@ body {
   cursor: pointer; font: inherit; font-weight: 700;
 }
 .nav a:hover, .btn:hover { transform: translateY(-2px); }
+.back-btn { margin: 4px 0 14px; font-size: 15px; padding: 8px 16px; }
+.nav a.active { box-shadow: 0 6px 0 #4aa89a, 0 0 0 4px var(--butter), var(--shadow); }
 .nav a:active, .btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #4aa89a; }
 .btn.pink { background: linear-gradient(180deg, var(--magenta), #d25a9d); box-shadow: 0 6px 0 #b04885, var(--shadow); }
 .btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
