@@ -17,6 +17,8 @@
     document.title = settings.store_name || 'TOKO HAZZE';
   }
 
+  const canBuy = (p) => p.available && (p.stock ?? 0) > 0;
+
   function renderCatalog() {
     const list = products;
     $('catalog').innerHTML = list.length ? list.map((p) => `
@@ -27,8 +29,9 @@
         <span class="badge ${T.esc(p.account_type)}">Akun ${T.esc(p.account_type)}</span>
         ${p.description ? `<p style="margin:4px 0;font-size:15px">${T.esc(p.description)}</p>` : ''}
         <div class="price">${T.rupiah(p.price)}</div>
-        <button class="btn" data-add="${p.id}" ${p.available ? '' : 'disabled'}>
-          ${p.available ? 'Tambah ke Keranjang' : 'Tidak tersedia'}
+        <div style="font-size:14px">Stok: ${p.stock ?? 0}</div>
+        <button class="btn" data-add="${p.id}" ${canBuy(p) ? '' : 'disabled'}>
+          ${canBuy(p) ? 'Tambah ke Keranjang' : 'Stok habis'}
         </button>
       </article>`).join('') : '<div class="empty">Katalog belum tersedia.</div>';
   }
@@ -82,9 +85,12 @@
 
   function addToCart(id) {
     const p = products.find((x) => x.id === id);
-    if (!p || !p.available) return;
+    if (!p || !canBuy(p)) return T.toast('Stok habis');
     const found = cart.find((c) => c.id === id);
-    if (found) found.qty += 1;
+    if (found) {
+      if (found.qty >= p.stock) return T.toast('Stok tidak cukup');
+      found.qty += 1;
+    }
     else cart.push({ id: p.id, name: p.name, account_type: p.account_type, price: p.price, image_url: p.image_url, qty: 1 });
     saveCart(); renderCart();
     T.toast('Berhasil ditambahkan ke keranjang');
@@ -118,7 +124,13 @@
     if (!t) return;
     if (t.dataset.home !== undefined) return (location.hash = '');
     if (t.dataset.add) return addToCart(t.dataset.add);
-    if (t.dataset.inc) { const c = cart.find((x) => x.id === t.dataset.inc); if (c) c.qty++; saveCart(); return renderCart(); }
+    if (t.dataset.inc) {
+      const c = cart.find((x) => x.id === t.dataset.inc);
+      const p = products.find((x) => x.id === t.dataset.inc);
+      if (c && p && c.qty < p.stock) c.qty++;
+      else if (c) T.toast('Stok tidak cukup');
+      saveCart(); return renderCart();
+    }
     if (t.dataset.dec) { const c = cart.find((x) => x.id === t.dataset.dec); if (c) c.qty = Math.max(1, c.qty - 1); saveCart(); return renderCart(); }
     if (t.dataset.del) { cart = cart.filter((x) => x.id !== t.dataset.del); saveCart(); return renderCart(); }
     if (t.dataset.zoom !== undefined) {
