@@ -42,7 +42,7 @@
   }
 
   // Hanya satu bagian (Katalog / Testimonials / Order Proof) yang tampil sekaligus.
-  const SECTIONS = ['katalog', 'testimonials', 'order-proof'];
+  const SECTIONS = ['katalog', 'testimonials'];
   // Tanpa hash = halaman depan (hanya header dan menu). Dengan hash = satu halaman saja.
   function showSection(id) {
     const target = SECTIONS.includes(id) ? id : null;
@@ -149,18 +149,16 @@
       $('catalog').innerHTML = '<div class="notice">Isi config.js dengan URL dan anon key Supabase dulu.</div>';
       renderCart(); return;
     }
-    const [p, s, t, o] = await Promise.all([
+    const [p, s, t] = await Promise.all([
       db.from('products').select('*').order('sort_order').order('created_at'),
       db.from('settings').select('*').eq('id', 1).single(),
       db.from('testimonials').select('*').eq('published', true).order('sort_order'),
-      db.from('order_proofs').select('*').eq('published', true).order('sort_order'),
     ]);
     if (p.error) console.error(p.error);
     products = p.data || [];
     settings = s.data || null;
     renderSettings(); renderCatalog();
     renderGallery($('testimonialGallery'), t.data || []);
-    renderGallery($('proofGallery'), o.data || []);
     renderCart();
     showSection(location.hash.slice(1));
   }
