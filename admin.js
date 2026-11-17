@@ -39,20 +39,18 @@
   }));
 
   async function loadAll() {
-    const [p, t, o, s] = await Promise.all([
+    const [p, t, s] = await Promise.all([
       db.from('products').select('*').order('sort_order').order('created_at'),
       db.from('testimonials').select('*').order('sort_order'),
-      db.from('order_proofs').select('*').order('sort_order'),
       db.from('settings').select('*').eq('id', 1).single(),
     ]);
-    state = { products: p.data || [], testimonials: t.data || [], order_proofs: o.data || [], settings: s.data };
-    renderStats(); renderProducts(); renderGallery('testimonials'); renderGallery('order_proofs'); renderSettings();
+    state = { products: p.data || [], testimonials: t.data || [], settings: s.data };
+    renderStats(); renderProducts(); renderGallery('testimonials'); renderSettings();
   }
 
   function renderStats() {
     $('statProducts').textContent = state.products.length;
     $('statTesti').textContent = state.testimonials.length;
-    $('statProof').textContent = state.order_proofs.length;
   }
 
   // ===== Katalog =====
@@ -147,7 +145,7 @@
 
   // ===== Galeri testimoni & order proof =====
   function renderGallery(table) {
-    const rowsEl = table === 'testimonials' ? $('testiRows') : $('proofRows');
+    const rowsEl = $('testiRows');
     rowsEl.innerHTML = state[table].map((r) => `
       <tr>
         <td><img src="${T.esc(r.image_url)}" alt="" style="width:60px;height:60px;object-fit:cover;border-radius:10px"></td>
