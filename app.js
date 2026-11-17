@@ -12,6 +12,7 @@
     if (!settings) return;
     $('storeName').textContent = settings.store_name || 'TOKO HAZZE';
     $('welcome').textContent = settings.welcome_text || '';
+    $('aboutText').textContent = settings.store_description || 'Deskripsi toko belum diisi.';
     $('footer').textContent = settings.footer_text || '';
     if (settings.profile_image_url) $('avatar').src = settings.profile_image_url;
     document.title = settings.store_name || 'TOKO HAZZE';
@@ -45,7 +46,7 @@
   }
 
   // Hanya satu bagian (Katalog / Testimonials / Order Proof) yang tampil sekaligus.
-  const SECTIONS = ['katalog', 'testimonials'];
+  const SECTIONS = ['katalog', 'testimonials', 'about'];
   // Tanpa hash = halaman depan (hanya header dan menu). Dengan hash = satu halaman saja.
   function showSection(id) {
     const target = SECTIONS.includes(id) ? id : null;
