@@ -63,7 +63,7 @@
         <td>${T.esc(p.name)}</td>
         <td>${T.esc(p.account_type)}</td>
         <td>${T.rupiah(p.price)}</td>
-        <td>${p.available ? 'Tersedia' : 'Tidak'}</td>
+        <td>${p.available ? 'Tersedia' : 'Tidak'} · Stok ${p.stock ?? 0}</td>
         <td class="row-actions">
           <button data-edit="${p.id}">Edit</button>
           <button data-up="${p.id}">▲</button>
@@ -90,7 +90,7 @@
         account_type: $('pType').value,
         price: Number($('pPrice').value),
         description: $('pDesc').value.trim() || null,
-        sort_order: Number($('pOrder').value) || 0,
+        stock: Math.max(0, Number($('pStock').value) || 0),
         available: $('pAvail').checked,
         image_url,
       };
@@ -108,7 +108,7 @@
     if (b.dataset.edit) {
       const p = state.products.find((x) => x.id === b.dataset.edit);
       $('productId').value = p.id; $('pName').value = p.name; $('pType').value = p.account_type;
-      $('pPrice').value = p.price; $('pDesc').value = p.description || ''; $('pOrder').value = p.sort_order;
+      $('pPrice').value = p.price; $('pDesc').value = p.description || ''; $('pStock').value = p.stock ?? 0;
       $('pAvail').checked = p.available; window.scrollTo({ top: 0, behavior: 'smooth' });
     }
     if (b.dataset.delp && confirm('Hapus aplikasi ini?')) {
