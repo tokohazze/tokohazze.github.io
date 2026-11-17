@@ -54,7 +54,8 @@
     $('cartPanel').hidden = true;
     window.scrollTo({ top: target ? document.querySelector('.nav').offsetTop - 10 : 0, behavior: 'smooth' });
   }
-  window.addEventListener('hashchange', () => showSection(location.hash.slice(1)));
+  // Setiap kali menu dibuka, data dimuat ulang dari Supabase agar perubahan dari admin langsung terlihat.
+  window.addEventListener('hashchange', () => load());
 
   function cartCount() { return cart.reduce((n, c) => n + c.qty, 0); }
 
