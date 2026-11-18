@@ -51,22 +51,25 @@
         <form id="productForm">
           <input type="hidden" id="productId">
           <label>Nama aplikasi<input id="pName" required></label>
-          <label>Jenis akun
-            <select id="pType"><option>Sharing</option><option>Private</option></select>
-          </label>
           <label>Kategori
             <select id="pCategory"></select>
           </label>
-          <label>Harga (Rp)<input type="number" id="pPrice" min="0" required></label>
           <label>Deskripsi (opsional)<textarea id="pDesc" rows="2"></textarea></label>
-          <label>Stok<input type="number" id="pStock" min="0" value="0" required></label>
-          <label><input type="checkbox" id="pAvail" checked style="width:auto"> Tersedia</label>
+          <label><input type="checkbox" id="pAvail" checked style="width:auto"> Aplikasi tersedia</label>
           <label>Foto aplikasi<input type="file" id="pFile" accept="image/*"></label>
-          <button class="btn" type="submit">Simpan</button>
-          <button class="btn" type="button" id="pCancel" style="background:#ddd;box-shadow:none;color:#555">Batal</button>
+
+          <h4 class="sub">Pilihan jenis akun</h4>
+          <p class="notice">Buat pilihan sendiri, misalnya "Sharing 2 user", "Sharing 1 user", "Private". Di katalog, harga "mulai dari" diambil dari pilihan termurah yang tersedia.</p>
+          <div id="optRows"></div>
+          <button class="btn" type="button" id="addOpt" style="background:var(--baby)">+ Tambah pilihan</button>
+
+          <div style="margin-top:14px">
+            <button class="btn" type="submit">Simpan</button>
+            <button class="btn" type="button" id="pCancel" style="background:#ddd;box-shadow:none;color:#555">Batal</button>
+          </div>
         </form>
         <table style="margin-top:16px">
-          <thead><tr><th>Foto</th><th>Nama</th><th>Akun</th><th>Harga</th><th>Status</th><th></th></tr></thead>
+          <thead><tr><th>Foto</th><th>Nama</th><th>Kategori</th><th>Pilihan</th><th>Status</th><th></th></tr></thead>
           <tbody id="productRows"></tbody>
         </table>
       </div>
@@ -118,7 +121,7 @@
           <label>Format pesan<textarea id="cTemplate" rows="9"></textarea></label>
           <p class="notice">Placeholder: {intro} (kalimat pembuka), {items} (daftar pesanan), {total} (total). Kosongkan untuk format standar. Di WhatsApp, *teks* jadi tebal dan _teks_ jadi miring.</p>
           <label>Format tiap item<textarea id="cItem" rows="4"></textarea></label>
-          <p class="notice">Placeholder: {no}, {name}, {type} (Sharing/Private), {qty}, {price}, {subtotal}.</p>
+          <p class="notice">Placeholder: {no}, {name}, {type} (nama pilihan, mis. Sharing 2 user), {qty}, {price}, {subtotal}.</p>
           <button class="btn" type="submit">Simpan</button>
         </form>
       </div>

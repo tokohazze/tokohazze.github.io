@@ -34,7 +34,24 @@ Kindly refrain from requesting rush orders, as each order is processed according
 
   const $ = (id) => document.getElementById(id);
   const saveCart = () => localStorage.setItem(CART_KEY, JSON.stringify(cart));
-  const canBuy = (p) => p.available && (p.stock ?? 0) > 0;
+  let openProductId = null; // aplikasi yang pilihannya sedang dibuka di sheet
+  // Pilihan (product_options) yang bisa dibeli: tersedia dan stok > 0.
+  const canBuy = (o) => o.available && (o.stock ?? 0) > 0;
+  const productAvailable = (p) => p.available && p.options.some(canBuy);
+  const sortOptions = (list) => (list || []).slice().sort((a, b) => a.sort_order - b.sort_order);
+  // Harga "mulai dari": pilihan termurah yang bisa dibeli, kalau tidak ada ambil yang termurah dari semua.
+  const minPrice = (p) => {
+    const buy = p.options.filter(canBuy);
+    const pool = buy.length ? buy : p.options;
+    return pool.length ? Math.min(...pool.map((o) => o.price)) : null;
+  };
+  const findOption = (id) => {
+    for (const p of products) {
+      const o = p.options.find((x) => x.id === id);
+      if (o) return { p, o };
+    }
+    return null;
+  };
   const cartCount = () => cart.reduce((n, c) => n + c.qty, 0);
   const lines = (text) => (text || '').split('\n').map((s) => s.trim()).filter(Boolean);
 
@@ -77,22 +94,24 @@ Kindly refrain from requesting rush orders, as each order is processed according
   }
 
   function productCard(p, i) {
+    const min = minPrice(p);
+    const n = p.options.length;
     return `
-      <article class="card${p.available ? '' : ' unavailable'}">
+      <article class="card${productAvailable(p) ? '' : ' unavailable'}">
         <div class="card-top" style="background-color:${COLORS[i % COLORS.length]}">
           <img src="${T.esc(p.image_url || '')}" alt="${T.esc(p.name)}" data-zoom>
-          <span class="label">${T.esc(p.account_type)}</span>
+          <span class="label">${n} pilihan</span>
         </div>
         <div class="card-body">
-          <span class="cat">Akun ${T.esc(p.account_type)} · ${canBuy(p) ? 'Stok ' + (p.stock ?? 0) : 'Stok habis'}</span>
+          <span class="cat">${productAvailable(p) ? 'Tersedia' : 'Stok habis'}</span>
           <h3>${T.esc(p.name)}</h3>
           ${p.description ? `<p class="desc">${T.esc(p.description)}</p>` : ''}
           <div class="card-foot">
             <div>
               <small>Mulai dari</small>
-              <div class="price">${T.rupiah(p.price)}</div>
+              <div class="price">${min === null ? '-' : T.rupiah(min)}</div>
             </div>
-            <button class="add" data-add="${p.id}" ${canBuy(p) ? '' : 'disabled'} aria-label="Tambah ke keranjang">${canBuy(p) ? '+' : '×'}</button>
+            <button class="add" data-open="${p.id}" ${n ? '' : 'disabled'} aria-label="Lihat pilihan">+</button>
           </div>
         </div>
       </article>`;
@@ -110,7 +129,7 @@ Kindly refrain from requesting rush orders, as each order is processed according
   // Katalog: pencarian nama, filter kategori (pill), lalu dikelompokkan per kategori.
   function renderCatalog() {
     const catOf = (p) => p.category || 'Lainnya';
-    const available = products.filter((p) => p.available).length;
+    const available = products.filter(productAvailable).length;
     $('catCount').textContent = `${available} aplikasi tersedia`;
 
     const cats = ['Semua', ...allCategories().filter((c) => products.some((p) => catOf(p) === c))];
@@ -153,7 +172,7 @@ Kindly refrain from requesting rush orders, as each order is processed according
         <img src="${T.esc(c.image_url || '')}" alt="">
         <div>
           <strong>${T.esc(c.name)}</strong><br>
-          <span class="badge">Akun ${T.esc(c.account_type)}</span><br>
+          <span class="badge">${T.esc(c.label)}</span><br>
           ${T.rupiah(c.price)} × ${c.qty} = <b>${T.rupiah(c.price * c.qty)}</b>
         </div>
         <div class="qty">
@@ -164,18 +183,65 @@ Kindly refrain from requesting rush orders, as each order is processed according
     $('cartTotal').textContent = 'Total: ' + T.rupiah(cart.reduce((n, c) => n + c.price * c.qty, 0));
   }
 
-  function addToCart(id) {
-    const p = products.find((x) => x.id === id);
-    if (!p || !canBuy(p)) return T.toast('Stok habis');
-    const found = cart.find((c) => c.id === id);
+  // Keranjang menyimpan satu pilihan (id = id pilihan), plus nama aplikasi dan label pilihannya.
+  function addToCart(optId) {
+    const hit = findOption(optId);
+    if (!hit || !canBuy(hit.o)) return T.toast('Stok habis');
+    const found = cart.find((c) => c.id === optId);
     if (found) {
-      if (found.qty >= p.stock) return T.toast('Stok tidak cukup');
+      if (found.qty >= hit.o.stock) return T.toast('Stok tidak cukup');
       found.qty += 1;
     } else {
-      cart.push({ id: p.id, name: p.name, account_type: p.account_type, price: p.price, image_url: p.image_url, qty: 1 });
+      cart.push({ id: hit.o.id, pid: hit.p.id, name: hit.p.name, label: hit.o.label, price: hit.o.price, image_url: hit.p.image_url, qty: 1 });
     }
     saveCart(); renderCart();
     T.toast('Berhasil ditambahkan ke keranjang');
+  }
+
+  // Harga, nama, dan label di keranjang mengikuti data terbaru. Pilihan yang sudah dihapus admin dikeluarkan.
+  function syncCart() {
+    cart = cart.reduce((acc, c) => {
+      const hit = findOption(c.id);
+      if (hit) acc.push({ ...c, pid: hit.p.id, name: hit.p.name, label: hit.o.label, price: hit.o.price, image_url: hit.p.image_url });
+      return acc;
+    }, []);
+    saveCart();
+  }
+
+  // Sheet pilihan: tampil saat kartu aplikasi diketuk.
+  function renderSheet() {
+    const p = products.find((x) => x.id === openProductId);
+    if (!p) return closeSheet();
+    $('sheetBody').innerHTML = `
+      <div class="sheet-head">
+        <img src="${T.esc(p.image_url || '')}" alt="${T.esc(p.name)}">
+        <div>
+          <h3>${T.esc(p.name)}</h3>
+          ${p.description ? `<p class="desc">${T.esc(p.description)}</p>` : ''}
+        </div>
+      </div>
+      <p class="sheet-label">PILIH JENIS AKUN</p>
+      <div class="opt-list">
+        ${p.options.map((o) => `
+          <div class="opt${canBuy(o) ? '' : ' off'}">
+            <div>
+              <b>${T.esc(o.label)}</b>
+              <small>${canBuy(o) ? 'Stok ' + o.stock : 'Stok habis'}</small>
+            </div>
+            <div class="opt-buy">
+              <span class="price">${T.rupiah(o.price)}</span>
+              <button class="add" data-add="${o.id}" ${canBuy(o) ? '' : 'disabled'} aria-label="Tambah ke keranjang">${canBuy(o) ? '+' : '×'}</button>
+            </div>
+          </div>`).join('') || '<p class="notice">Pilihan untuk aplikasi ini belum tersedia.</p>'}
+      </div>`;
+    $('sheet').hidden = false;
+    document.body.style.overflow = 'hidden';
+  }
+  function openSheet(id) { openProductId = id; renderSheet(); }
+  function closeSheet() {
+    openProductId = null;
+    $('sheet').hidden = true;
+    document.body.style.overflow = '';
   }
 
   // Format bawaan. Admin bisa mengganti lewat kolom wa_template dan wa_item_template.
@@ -186,7 +252,7 @@ Kindly refrain from requesting rush orders, as each order is processed according
   function buildWhatsAppMessage() {
     const itemTpl = settings?.wa_item_template || DEFAULT_ITEM;
     const items = cart.map((c, i) => fill(itemTpl, {
-      no: i + 1, name: c.name, type: c.account_type, qty: c.qty,
+      no: i + 1, name: c.name, type: c.label, qty: c.qty,
       price: T.rupiah(c.price), subtotal: T.rupiah(c.price * c.qty),
     })).join('\n\n');
     const total = cart.reduce((n, c) => n + c.price * c.qty, 0);
@@ -228,11 +294,13 @@ Kindly refrain from requesting rush orders, as each order is processed according
     if (!t) return;
     if (t.dataset.home !== undefined) return goHome();
     if (t.dataset.cat !== undefined) { filter.cat = t.dataset.cat; return renderCatalog(); }
+    if (t.dataset.open) return openSheet(t.dataset.open);
+    if (t.hasAttribute('data-close')) return closeSheet();
     if (t.dataset.add) return addToCart(t.dataset.add);
     if (t.dataset.inc) {
       const c = cart.find((x) => x.id === t.dataset.inc);
-      const p = products.find((x) => x.id === t.dataset.inc);
-      if (c && p && c.qty < p.stock) c.qty++;
+      const hit = findOption(t.dataset.inc);
+      if (c && hit && c.qty < hit.o.stock) c.qty++;
       else if (c) T.toast('Stok tidak cukup');
       saveCart(); return renderCart();
     }
@@ -244,6 +312,7 @@ Kindly refrain from requesting rush orders, as each order is processed according
     }
   });
   $('lightbox').addEventListener('click', () => $('lightbox').classList.remove('open'));
+  $('sheet').addEventListener('click', (e) => { if (e.target.id === 'sheet') closeSheet(); });
 
   $('search').addEventListener('input', (e) => { filter.q = e.target.value; renderCatalog(); });
 
@@ -277,13 +346,14 @@ Kindly refrain from requesting rush orders, as each order is processed according
       renderCart(); showSection(location.hash.slice(1)); return;
     }
     const [p, s, t, c] = await Promise.all([
-      db.from('products').select('*').order('sort_order').order('created_at'),
+      db.from('products').select('*, product_options(*)').order('sort_order').order('created_at'),
       db.from('settings').select('*').eq('id', 1).single(),
       db.from('testimonials').select('*').eq('published', true).order('sort_order'),
       db.from('categories').select('*').order('sort_order'),
     ]);
     if (p.error) console.error(p.error);
-    products = p.data || [];
+    products = (p.data || []).map((x) => ({ ...x, options: sortOptions(x.product_options) }));
+    if (products.length) syncCart();
     categories = (c.data || []).map((x) => x.name);
     catIcons = Object.fromEntries((c.data || []).map((x) => [x.name, x.icon || '']));
     settings = s.data || null;

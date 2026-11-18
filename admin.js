@@ -2,7 +2,8 @@
 (function () {
   const T = window.TOKO;
   const $ = (id) => document.getElementById(id);
-  let state = { products: [], testimonials: [], order_proofs: [], settings: null };
+  let state = { products: [], testimonials: [], order_proofs: [], settings: null, categories: [] };
+  let removedOptionIds = []; // pilihan yang dihapus saat sedang mengedit aplikasi
 
   function show(view) {
     $('loginView').hidden = view !== 'login';
@@ -38,14 +39,26 @@
     document.querySelectorAll('.tab').forEach((t) => t.hidden = t.id !== 'tab-' + b.dataset.tab);
   }));
 
+  // Pilihan (product_options) diurutkan sesuai sort_order.
+  const withOptions = (x) => ({
+    ...x,
+    options: (x.product_options || []).slice().sort((a, b) => a.sort_order - b.sort_order),
+  });
+
   async function loadAll() {
     const [p, t, s, c] = await Promise.all([
-      db.from('products').select('*').order('sort_order').order('created_at'),
+      db.from('products').select('*, product_options(*)').order('sort_order').order('created_at'),
       db.from('testimonials').select('*').order('sort_order'),
       db.from('settings').select('*').eq('id', 1).single(),
       db.from('categories').select('*').order('sort_order'),
     ]);
-    state = { products: p.data || [], testimonials: t.data || [], settings: s.data, categories: c.data || [] };
+    if (p.error) console.error(p.error);
+    state = {
+      products: (p.data || []).map(withOptions),
+      testimonials: t.data || [],
+      settings: s.data,
+      categories: c.data || [],
+    };
     renderStats(); renderCategoryOptions(); renderProducts(); renderCategories(); renderGallery('testimonials'); renderSettings();
   }
 
@@ -104,26 +117,67 @@
     $('categoryForm').reset(); T.toast('Kategori ditambahkan'); loadAll();
   });
 
-  // ===== Katalog =====
+  // ===== Katalog (aplikasi + pilihannya) =====
   function renderProducts() {
-    $('productRows').innerHTML = state.products.map((p) => `
+    $('productRows').innerHTML = state.products.map((p) => {
+      const list = p.options.map((o) =>
+        `${T.esc(o.label)} · ${T.rupiah(o.price)} · stok ${o.stock ?? 0}${o.available ? '' : ' (nonaktif)'}`).join('<br>');
+      const min = p.options.length ? Math.min(...p.options.map((o) => o.price)) : null;
+      return `
       <tr>
         <td><img src="${T.esc(p.image_url || '')}" alt=""></td>
         <td>${T.esc(p.name)}</td>
-        <td>${T.esc(p.account_type)} · ${T.esc(p.category || 'Lainnya')}</td>
-        <td>${T.rupiah(p.price)}</td>
-        <td>${p.available ? 'Tersedia' : 'Tidak'} · Stok ${p.stock ?? 0}</td>
+        <td>${T.esc(p.category || 'Lainnya')}</td>
+        <td>${list || '<i>Belum ada pilihan</i>'}</td>
+        <td>${min === null ? '-' : 'Mulai ' + T.rupiah(min)}<br>${p.available ? 'Tersedia' : 'Tidak tersedia'}</td>
         <td class="row-actions">
           <button data-edit="${p.id}">Edit</button>
           <button data-up="${p.id}">▲</button>
           <button data-down="${p.id}">▼</button>
           <button class="danger" data-delp="${p.id}">Hapus</button>
         </td>
-      </tr>`).join('') || '<tr><td colspan="6">Belum ada aplikasi.</td></tr>';
+      </tr>`;
+    }).join('') || '<tr><td colspan="6">Belum ada aplikasi.</td></tr>';
   }
+
+  // Satu baris pilihan di editor form aplikasi.
+  function optionRow(o = {}) {
+    return `
+      <div class="opt-edit" data-oid="${o.id || ''}">
+        <input data-f="label" placeholder="Mis. Sharing 2 user" value="${T.esc(o.label || '')}" required>
+        <input data-f="price" type="number" min="0" placeholder="Harga" value="${o.price ?? ''}" required>
+        <input data-f="stock" type="number" min="0" placeholder="Stok" value="${o.stock ?? 0}">
+        <label class="chk"><input data-f="available" type="checkbox" ${o.available === false ? '' : 'checked'}> Tersedia</label>
+        <button class="danger" type="button" data-optdel>✕</button>
+      </div>`;
+  }
+
+  function renderOptionRows(list) {
+    $('optRows').innerHTML = list.length
+      ? list.map((o) => optionRow(o)).join('')
+      : '<p class="notice">Belum ada pilihan. Tambah minimal satu.</p>';
+  }
+
+  // Baca semua baris pilihan dari form.
+  function readOptionRows() {
+    return [...$('optRows').querySelectorAll('.opt-edit')].map((row, i) => ({
+      id: row.dataset.oid || null,
+      label: row.querySelector('[data-f=label]').value.trim(),
+      price: Math.max(0, Number(row.querySelector('[data-f=price]').value) || 0),
+      stock: Math.max(0, Number(row.querySelector('[data-f=stock]').value) || 0),
+      available: row.querySelector('[data-f=available]').checked,
+      sort_order: i,
+    }));
+  }
+
+  $('addOpt').addEventListener('click', () => {
+    if ($('optRows').querySelector('.notice')) $('optRows').innerHTML = '';
+    $('optRows').insertAdjacentHTML('beforeend', optionRow({ available: true, stock: 0 }));
+  });
 
   function resetProductForm() {
     $('productForm').reset(); $('productId').value = ''; $('pAvail').checked = true;
+    removedOptionIds = []; renderOptionRows([]);
   }
   $('pCancel').addEventListener('click', resetProductForm);
 
@@ -131,23 +185,40 @@
     e.preventDefault();
     const id = $('productId').value;
     const file = $('pFile').files[0];
+    const options = readOptionRows();
+    if (!options.length) return alert('Tambah minimal satu pilihan, misalnya Sharing 2 user.');
+    if (options.some((o) => !o.label)) return alert('Nama setiap pilihan harus diisi.');
     let image_url = id ? state.products.find((p) => p.id === id)?.image_url : null;
     try {
       if (file) image_url = await T.uploadImage(file);
       const row = {
         name: $('pName').value.trim(),
-        account_type: $('pType').value,
         category: $('pCategory').value,
-        price: Number($('pPrice').value),
         description: $('pDesc').value.trim() || null,
-        stock: Math.max(0, Number($('pStock').value) || 0),
         available: $('pAvail').checked,
         image_url,
       };
-      const res = id
-        ? await db.from('products').update(row).eq('id', id)
-        : await db.from('products').insert(row);
-      if (res.error) throw res.error;
+      let productId = id;
+      if (id) {
+        const { error } = await db.from('products').update(row).eq('id', id);
+        if (error) throw error;
+      } else {
+        const { data, error } = await db.from('products').insert(row).select('id').single();
+        if (error) throw error;
+        productId = data.id;
+      }
+      // Pilihan yang dibuang dihapus, lalu pilihan lain diperbarui atau ditambahkan.
+      if (removedOptionIds.length) {
+        const { error } = await db.from('product_options').delete().in('id', removedOptionIds);
+        if (error) throw error;
+      }
+      for (const o of options) {
+        const fields = { label: o.label, price: o.price, stock: o.stock, available: o.available, sort_order: o.sort_order };
+        const res = o.id
+          ? await db.from('product_options').update(fields).eq('id', o.id)
+          : await db.from('product_options').insert({ ...fields, product_id: productId });
+        if (res.error) throw res.error;
+      }
       T.toast('Aplikasi disimpan'); resetProductForm(); loadAll();
     } catch (err) { alert('Gagal menyimpan: ' + err.message); }
   });
@@ -155,14 +226,23 @@
   document.addEventListener('click', async (e) => {
     const b = e.target.closest('button');
     if (!b) return;
+    if (b.hasAttribute('data-optdel')) {
+      const row = b.closest('.opt-edit');
+      if (row.dataset.oid) removedOptionIds.push(row.dataset.oid);
+      row.remove();
+      if (!$('optRows').querySelector('.opt-edit')) renderOptionRows([]);
+      return;
+    }
     if (b.dataset.edit) {
       const p = state.products.find((x) => x.id === b.dataset.edit);
-      $('productId').value = p.id; $('pName').value = p.name; $('pType').value = p.account_type;
+      $('productId').value = p.id; $('pName').value = p.name;
       $('pCategory').value = p.category || 'Lainnya';
-      $('pPrice').value = p.price; $('pDesc').value = p.description || ''; $('pStock').value = p.stock ?? 0;
-      $('pAvail').checked = p.available; window.scrollTo({ top: 0, behavior: 'smooth' });
+      $('pDesc').value = p.description || ''; $('pAvail').checked = p.available;
+      removedOptionIds = [];
+      renderOptionRows(p.options);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-    if (b.dataset.delp && confirm('Hapus aplikasi ini?')) {
+    if (b.dataset.delp && confirm('Hapus aplikasi ini beserta semua pilihannya?')) {
       await db.from('products').delete().eq('id', b.dataset.delp); loadAll();
     }
     if (b.dataset.up || b.dataset.down) {
@@ -216,7 +296,7 @@
     loadAll();
   }
 
-  // ===== Galeri testimoni & order proof =====
+  // ===== Galeri testimoni =====
   function renderGallery(table) {
     const rowsEl = $('testiRows');
     rowsEl.innerHTML = state[table].map((r) => `
@@ -291,6 +371,8 @@
     if (error) return alert('Gagal menyimpan: ' + error.message);
     T.toast('Kontak disimpan'); loadAll();
   });
+
+  renderOptionRows([]);
 
   // Tunggu shared.js selesai memuat (defer).
   window.addEventListener('load', checkSession);
