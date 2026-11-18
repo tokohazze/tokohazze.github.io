@@ -4,12 +4,46 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Toko Hazze</title>
+  <script>
+    // Pengunjung yang sudah pernah membuka, atau membuka halaman tertentu, langsung ke beranda.
+    try { if (localStorage.getItem('toko-hazze-intro-seen') || location.hash) document.documentElement.classList.add('no-intro'); } catch (e) {}
+  </script>
   <link rel="stylesheet" href="styles.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
+  <script src="icons.js"></script>
   <script src="shared.js" defer></script>
 </head>
 <body>
+  <!-- Pembuka: amplop surat -> ID Card -->
+  <section class="intro" id="intro" aria-label="Pembuka">
+    <button class="skip-btn" id="skipIntro" type="button">Skip Animation</button>
+    <p class="intro-kicker">A LITTLE SOMETHING FOR YOU</p>
+    <h1 class="intro-title">YOU'VE GOT A LETTER FROM HAZZE</h1>
+    <div class="stage" id="stage">
+      <div class="envelope" id="envelope" role="button" tabindex="0" aria-label="Buka amplop">
+        <div class="letter"></div>
+        <div class="env-body"></div>
+        <div class="env-flap"></div>
+        <div class="seal" aria-hidden="true">H</div>
+        <div class="stamp" aria-hidden="true">2024</div>
+      </div>
+      <div class="id-card idcard" id="introCard">
+        <div class="id-band"><span>TOKO HAZZE ID</span><span>No. HZ-0001</span></div>
+        <div class="id-body">
+          <div class="id-photo"><img data-id-avatar src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt=""></div>
+          <div class="id-info">
+            <p class="id-brand" data-id-name>Toko Hazze</p>
+            <p class="id-tag" data-id-tagline>Your Digital Happy Place</p>
+            <p class="id-meta">Since 2024 · Digital Store</p>
+          </div>
+        </div>
+        <div class="id-barcode" aria-hidden="true"></div>
+      </div>
+    </div>
+    <button class="btn pink tap-btn" id="tapOpen" type="button">TAP TO OPEN</button>
+  </section>
+
   <header class="topbar">
     <span class="brand-name" id="brandName">Toko Hazze</span>
     <button class="iconbtn" id="cartBtn" aria-label="Keranjang">🛒<span class="cart-count" id="cartCount">0</span></button>
@@ -18,36 +52,53 @@
   <main>
     <section class="home" id="home">
       <div class="hero">
-        <img id="avatar" class="avatar" alt="Foto profil toko" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=">
-        <p class="eyebrow">✦ SELAMAT DATANG ✦</p>
-        <h1 class="sign" id="storeName">Toko Hazze</h1>
-        <p class="welcome" id="welcome"></p>
-        <div class="chips">
-          <span>Sharing</span>
-          <span>Private</span>
-          <span>Checkout via WhatsApp</span>
+        <div class="id-card">
+          <div class="id-band"><span>TOKO HAZZE ID</span><span>No. HZ-0001</span></div>
+          <div class="id-body">
+            <div class="id-photo"><img data-id-avatar src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Foto profil toko"></div>
+            <div class="id-info">
+              <p class="id-brand" data-id-name>Toko Hazze</p>
+              <p class="id-tag" data-id-tagline>Your Digital Happy Place</p>
+              <p class="id-meta">Since 2024 · Digital Store</p>
+            </div>
+          </div>
+          <div class="id-barcode" aria-hidden="true"></div>
         </div>
+        <h1 class="welcome-title">Welcome to <span id="storeName">Toko Hazze</span>!</h1>
+        <p class="welcome" id="welcome"></p>
+        <div class="chips" id="highlights"></div>
       </div>
 
       <section class="menu-section">
-        <p class="menu-title">temukan aplikasi favoritmu ✦</p>
+        <p class="menu-title">Find Your Happy Place ✦</p>
         <nav class="nav">
           <a class="menu-card" href="#katalog">
             <span class="num">01</span>
-            <span><b>Catalogue</b><small>Lihat aplikasi dan pesan via WhatsApp</small></span>
+            <span><b>Catalogue</b><small>Explore your favorite digital apps.</small></span>
             <span class="arrow">↗</span>
           </a>
           <a class="menu-card" href="#testimonials">
             <span class="num">02</span>
-            <span><b>Proof of Trust</b><small>Bukti dan testimoni pelanggan</small></span>
+            <span><b>Proof of Trust</b><small>Little stories from our customers.</small></span>
             <span class="arrow">↗</span>
           </a>
-          <a class="menu-card" href="#about">
+          <button class="menu-card" id="contactMenu" type="button">
             <span class="num">03</span>
+            <span><b>Contact Me</b><small>Let's get in touch!</small></span>
+            <span class="arrow">↗</span>
+          </button>
+          <a class="menu-card" href="#about">
+            <span class="num">04</span>
             <span><b>About</b><small>Cerita dan info tentang toko</small></span>
             <span class="arrow">↗</span>
           </a>
         </nav>
+      </section>
+
+      <section class="notes-section">
+        <p class="eyebrow">BEFORE YOU ORDER</p>
+        <h2 class="notes-title">Little Notes from Hazze</h2>
+        <div id="notesList"></div>
       </section>
 
       <section class="contact-card" id="contact">
@@ -64,8 +115,13 @@
 
     <section class="page" id="katalog" hidden>
       <button class="btn back-btn" data-home>← Kembali ke menu</button>
-      <p class="eyebrow">✦ CATALOGUE ✦</p>
-      <h2 class="page-title">Pilih aplikasimu.</h2>
+      <p class="eyebrow">HAZZE CATALOG</p>
+      <h2 class="page-title">Find your next favorite app.</h2>
+      <p class="lead">Temukan aplikasi favoritmu dan pilih sesuai kebutuhan.</p>
+      <p class="count" id="catCount"></p>
+      <input id="search" class="search" type="search" placeholder="Cari aplikasi favoritmu...">
+      <div class="pills" id="filters"></div>
+      <p class="notice" id="catEmpty" hidden>Tidak ada aplikasi yang cocok. Coba kata kunci lain ya.</p>
       <div id="catalog"></div>
     </section>
 

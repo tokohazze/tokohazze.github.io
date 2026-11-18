@@ -39,19 +39,70 @@
   }));
 
   async function loadAll() {
-    const [p, t, s] = await Promise.all([
+    const [p, t, s, c] = await Promise.all([
       db.from('products').select('*').order('sort_order').order('created_at'),
       db.from('testimonials').select('*').order('sort_order'),
       db.from('settings').select('*').eq('id', 1).single(),
+      db.from('categories').select('*').order('sort_order'),
     ]);
-    state = { products: p.data || [], testimonials: t.data || [], settings: s.data };
-    renderStats(); renderProducts(); renderGallery('testimonials'); renderSettings();
+    state = { products: p.data || [], testimonials: t.data || [], settings: s.data, categories: c.data || [] };
+    renderStats(); renderCategoryOptions(); renderProducts(); renderCategories(); renderGallery('testimonials'); renderSettings();
   }
 
   function renderStats() {
     $('statProducts').textContent = state.products.length;
     $('statTesti').textContent = state.testimonials.length;
   }
+
+  // ===== Kategori =====
+  function renderCategories() {
+    $('catRows').innerHTML = state.categories.map((c) => {
+      const n = state.products.filter((p) => (p.category || 'Lainnya') === c.name).length;
+      return `
+      <tr>
+        <td>${window.TOKO_ICONS.svg(c.icon)} ${T.esc(c.name)}</td>
+        <td>${n} aplikasi</td>
+        <td class="row-actions">
+          <button data-cup="${c.id}">▲</button>
+          <button data-cdown="${c.id}">▼</button>
+          <select data-cicon="${c.id}">${iconOptions(c.icon)}</select>
+          <button data-crename="${c.id}">Ubah nama</button>
+          <button class="danger" data-cdel="${c.id}">Hapus</button>
+        </td>
+      </tr>`;
+    }).join('') || '<tr><td colspan="3">Belum ada kategori.</td></tr>';
+  }
+
+  // Isi pilihan kategori di form aplikasi, dan pertahankan pilihan yang sedang dipakai.
+  function renderCategoryOptions() {
+    const cur = $('pCategory').value;
+    $('pCategory').innerHTML = state.categories.map((c) => `<option>${T.esc(c.name)}</option>`).join('');
+    if (cur) $('pCategory').value = cur;
+  }
+
+  // Pilihan ikon: dipakai di form tambah kategori dan di tabel kategori.
+  const iconOptions = (current) => window.TOKO_ICONS.list
+    .map((i) => `<option value="${i.key}" ${i.key === current ? 'selected' : ''}>${i.label}</option>`).join('');
+  $('cgIcon').innerHTML = iconOptions('box');
+
+  document.addEventListener('change', async (e) => {
+    const s = e.target.closest('select[data-cicon]');
+    if (!s) return;
+    const { error } = await db.from('categories').update({ icon: s.value }).eq('id', s.dataset.cicon);
+    if (error) return alert('Gagal mengubah ikon: ' + error.message);
+    loadAll();
+  });
+
+  $('categoryForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const name = $('cgName').value.trim();
+    if (!name) return;
+    const sort = state.categories.length ? Math.max(...state.categories.map((c) => c.sort_order)) + 1 : 0;
+    const icon = $('cgIcon').value || null;
+    const { error } = await db.from('categories').insert({ name, icon, sort_order: sort });
+    if (error) return alert('Gagal menambah kategori: ' + error.message);
+    $('categoryForm').reset(); T.toast('Kategori ditambahkan'); loadAll();
+  });
 
   // ===== Katalog =====
   function renderProducts() {
@@ -128,6 +179,26 @@
       const v = prompt('Nomor urut baru:', b.dataset.cur || '');
       if (v !== null) { await db.from(b.dataset.table).update({ number: Number(v) || 0 }).eq('id', b.dataset.num); loadAll(); }
     }
+    if (b.dataset.cup || b.dataset.cdown) {
+      await swapOrder('categories', b.dataset.cup || b.dataset.cdown, b.dataset.cup ? -1 : 1, state.categories);
+    }
+    if (b.dataset.crename) {
+      const c = state.categories.find((x) => x.id === b.dataset.crename);
+      const v = prompt('Nama kategori baru:', c.name);
+      if (v && v.trim() && v.trim() !== c.name) {
+        const name = v.trim();
+        const { error } = await db.from('categories').update({ name }).eq('id', c.id);
+        if (error) return alert('Gagal mengubah nama: ' + error.message);
+        await db.from('products').update({ category: name }).eq('category', c.name);
+        loadAll();
+      }
+    }
+    if (b.dataset.cdel) {
+      const c = state.categories.find((x) => x.id === b.dataset.cdel);
+      const n = state.products.filter((p) => (p.category || 'Lainnya') === c.name).length;
+      if (n > 0) return alert(`Kategori ini masih dipakai ${n} aplikasi. Pindahkan dulu aplikasinya ke kategori lain.`);
+      if (confirm('Hapus kategori ini?')) { await db.from('categories').delete().eq('id', c.id); loadAll(); }
+    }
     if (b.dataset.tup || b.dataset.tdown) {
       const table = b.dataset.table;
       await swapOrder(table, b.dataset.tup || b.dataset.tdown, b.dataset.tup ? -1 : 1, state[table]);
@@ -185,6 +256,7 @@
     const s = state.settings || {};
     $('sName').value = s.store_name || ''; $('sWelcome').value = s.welcome_text || '';
     $('sDesc').value = s.store_description || ''; $('sFooter').value = s.footer_text || '';
+    $('sTagline').value = s.tagline || ''; $('sHighlights').value = s.highlights || ''; $('sNotes').value = s.notes_text || '';
     $('cNumber').value = s.whatsapp_number || ''; $('cIntro').value = s.wa_intro || '';
     $('cTemplate').value = s.wa_template || ''; $('cItem').value = s.wa_item_template || '';
   }
@@ -195,6 +267,9 @@
       const update = {
         store_name: $('sName').value, welcome_text: $('sWelcome').value,
         store_description: $('sDesc').value, footer_text: $('sFooter').value,
+        tagline: $('sTagline').value.trim() || null,
+        highlights: $('sHighlights').value.trim() || null,
+        notes_text: $('sNotes').value.trim() || null,
       };
       const file = $('sAvatar').files[0];
       if (file) update.profile_image_url = await T.uploadImage(file);

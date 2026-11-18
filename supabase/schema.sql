@@ -12,7 +12,7 @@ create table if not exists products (
   id uuid primary key default gen_random_uuid(),
   name text not null,
   account_type text not null check (account_type in ('Sharing', 'Private')),
-  category text not null default 'Lainnya' check (category in ('Streaming', 'Editing', 'Education', 'Lainnya')),
+  category text not null default 'Lainnya',
   price bigint not null check (price >= 0),
   description text,
   image_url text,
@@ -40,6 +40,17 @@ create table if not exists order_proofs (
   created_at timestamptz not null default now()
 );
 
+-- Kategori katalog: bisa ditambah, diubah, dan diurutkan dari admin.
+create table if not exists categories (
+  id uuid primary key default gen_random_uuid(),
+  name text unique not null,
+  icon text,
+  sort_order int not null default 0,
+  created_at timestamptz not null default now()
+);
+insert into categories (name, icon, sort_order) values ('Streaming', 'tv', 0), ('Editing', 'pencil', 1), ('Education', 'book', 2), ('Lainnya', 'play', 3)
+on conflict (name) do nothing;
+
 -- Pengaturan toko (satu baris saja).
 create table if not exists settings (
   id int primary key default 1 check (id = 1),
@@ -51,7 +62,10 @@ create table if not exists settings (
   whatsapp_number text not null default '6280000000000',
   wa_intro text not null default 'Halo, Toko Hazze! Saya ingin melakukan pemesanan.',
   wa_template text,
-  wa_item_template text
+  wa_item_template text,
+  tagline text,
+  highlights text,
+  notes_text text
 );
 insert into settings (id) values (1) on conflict (id) do nothing;
 
@@ -61,6 +75,7 @@ alter table products enable row level security;
 alter table testimonials enable row level security;
 alter table order_proofs enable row level security;
 alter table settings enable row level security;
+alter table categories enable row level security;
 
 create or replace function is_admin() returns boolean
 language sql stable security definer set search_path = public as $$
@@ -72,12 +87,14 @@ create policy "public read products" on products for select using (true);
 create policy "public read published testimonials" on testimonials for select using (published or is_admin());
 create policy "public read published proofs" on order_proofs for select using (published or is_admin());
 create policy "public read settings" on settings for select using (true);
+create policy "public read categories" on categories for select using (true);
 
 -- Hanya admin yang bisa menulis.
 create policy "admin write products" on products for all using (is_admin()) with check (is_admin());
 create policy "admin write testimonials" on testimonials for all using (is_admin()) with check (is_admin());
 create policy "admin write proofs" on order_proofs for all using (is_admin()) with check (is_admin());
 create policy "admin write settings" on settings for all using (is_admin()) with check (is_admin());
+create policy "admin write categories" on categories for all using (is_admin()) with check (is_admin());
 create policy "admin read admins" on admins for select using (is_admin());
 
 -- ===== Storage untuk gambar =====

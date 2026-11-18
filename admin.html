@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="styles.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
+  <script src="icons.js"></script>
   <script src="shared.js" defer></script>
 </head>
 <body>
@@ -39,6 +40,7 @@
       <div class="tabs">
         <button data-tab="catalog" class="active">Manage Catalog</button>
         <button data-tab="testimonials">Manage Proof of Trust</button>
+        <button data-tab="categories">Manage Categories</button>
         <button data-tab="website">Website Settings</button>
         <button data-tab="contact">Contact Settings</button>
       </div>
@@ -53,7 +55,7 @@
             <select id="pType"><option>Sharing</option><option>Private</option></select>
           </label>
           <label>Kategori
-            <select id="pCategory"><option>Streaming</option><option>Editing</option><option>Education</option><option>Lainnya</option></select>
+            <select id="pCategory"></select>
           </label>
           <label>Harga (Rp)<input type="number" id="pPrice" min="0" required></label>
           <label>Deskripsi (opsional)<textarea id="pDesc" rows="2"></textarea></label>
@@ -77,6 +79,21 @@
       </div>
 
 
+      <!-- Categories -->
+      <div class="panel tab" id="tab-categories" hidden>
+        <h3>Kategori katalog</h3>
+        <form id="categoryForm">
+          <label>Nama kategori baru<input id="cgName" required></label>
+          <label>Ikon<select id="cgIcon"></select></label>
+          <button class="btn" type="submit">Tambah kategori</button>
+        </form>
+        <p class="notice">Kategori yang masih dipakai aplikasi tidak bisa dihapus. Mengubah nama juga mengubah nama kategori di aplikasi yang memakainya.</p>
+        <table style="margin-top:16px">
+          <thead><tr><th>Nama</th><th>Jumlah</th><th></th></tr></thead>
+          <tbody id="catRows"></tbody>
+        </table>
+      </div>
+
       <!-- Website settings -->
       <div class="panel tab" id="tab-website" hidden>
         <form id="websiteForm">
@@ -84,6 +101,10 @@
           <label>Welcome text<textarea id="sWelcome" rows="2"></textarea></label>
           <label>Deskripsi toko<textarea id="sDesc" rows="3"></textarea></label>
           <label>Teks footer<input id="sFooter"></label>
+          <label>Tagline (contoh: YOUR DIGITAL HAPPY PLACE)<input id="sTagline"></label>
+          <label>Tiga label info (satu per baris)<textarea id="sHighlights" rows="3"></textarea></label>
+          <label>Little Notes<textarea id="sNotes" rows="14"></textarea></label>
+          <p class="notice">Little Notes: baris pertama tiap card = judul, baris berikutnya = isi. Pisahkan tiap card dengan satu baris kosong. Kosongkan untuk teks standar.</p>
           <label>Foto profil<input type="file" id="sAvatar" accept="image/*"></label>
           <button class="btn" type="submit">Simpan</button>
         </form>
