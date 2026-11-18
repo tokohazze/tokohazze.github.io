@@ -4,10 +4,6 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Toko Hazze</title>
-  <script>
-    // Pengunjung yang sudah pernah membuka, atau membuka halaman tertentu, langsung ke beranda.
-    try { if (localStorage.getItem('toko-hazze-intro-seen') || location.hash) document.documentElement.classList.add('no-intro'); } catch (e) {}
-  </script>
   <link rel="stylesheet" href="styles.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>

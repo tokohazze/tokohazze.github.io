@@ -296,10 +296,9 @@ Kindly refrain from requesting rush orders, as each order is processed according
   }
 
   // ===== Pembuka: amplop surat -> ID Card -> beranda =====
-  const INTRO_KEY = 'toko-hazze-intro-seen';
+  // Pembuka tampil setiap website dibuka. Tombol Skip atau selesai animasi menutupnya.
   let opening = false;
   function finishIntro() {
-    try { localStorage.setItem(INTRO_KEY, '1'); } catch (e) { /* penyimpanan browser tidak tersedia */ }
     $('intro').classList.add('gone');
   }
   function openEnvelope() {
