@@ -4,7 +4,7 @@
   const CART_KEY = 'toko-hazze-cart';
   const SECTIONS = ['katalog', 'testimonials', 'about'];
   const COLORS = ['var(--pink)', 'var(--butter)', 'var(--baby)', 'var(--mint)'];
-  const NOTE_COLORS = ['var(--sand)', 'var(--paper)', 'var(--olive)', 'var(--amber)'];
+  const NOTE_COLORS = ['var(--pink)', 'var(--baby)', 'var(--mint)', 'var(--butter)'];
   const FALLBACK_CATEGORY = 'Lainnya';
   let categories = []; // nama kategori dari tabel categories, sesuai urutan yang diatur admin
   let catIcons = {};   // nama kategori -> ikon (emoji) dari admin
@@ -265,12 +265,16 @@ Kindly refrain from requesting rush orders, as each order is processed according
   });
 
   // Setiap kali menu dibuka, data dimuat ulang dari Supabase agar perubahan dari admin langsung terlihat.
-  window.addEventListener('hashchange', () => load());
+  // Pindah halaman langsung saat menu diketuk (tidak menunggu data), lalu data dimuat ulang.
+  window.addEventListener('hashchange', () => {
+    showSection(location.hash.slice(1));
+    load();
+  });
 
   async function load() {
     if (!T.ready) {
       $('catalog').innerHTML = '<div class="notice">Isi config.js dulu.</div>';
-      renderCart(); return;
+      renderCart(); showSection(location.hash.slice(1)); return;
     }
     const [p, s, t, c] = await Promise.all([
       db.from('products').select('*').order('sort_order').order('created_at'),
@@ -283,9 +287,11 @@ Kindly refrain from requesting rush orders, as each order is processed according
     categories = (c.data || []).map((x) => x.name);
     catIcons = Object.fromEntries((c.data || []).map((x) => [x.name, x.icon || '']));
     settings = s.data || null;
-    renderSettings(); renderCatalog();
-    renderGallery($('testimonialGallery'), t.data || []);
-    renderCart();
+    try {
+      renderSettings(); renderCatalog();
+      renderGallery($('testimonialGallery'), t.data || []);
+      renderCart();
+    } catch (err) { console.error(err); }
     showSection(location.hash.slice(1));
   }
 

@@ -1,23 +1,23 @@
 /* ===== Token ===== */
 :root {
-  /* Palet Retro Stationery */
-  --plum: #3D315B;
-  --ivory: #F4EBDD;
-  --ivory-light: #FBF6EC;
-  --amber: #F2B84B;
-  --olive: #A6B17A;
-  --terra: #C45B45;
-  --sand: #E9D8BC;
-  --ink: var(--plum);
-  --deep: var(--plum);
-  --mint: var(--olive);
-  --pink: #E7C3AE;
-  --magenta: var(--terra);
-  --baby: #D9D0E3;
-  --butter: var(--amber);
-  --cream: var(--ivory);
-  --paper: var(--ivory-light);
-  --line: 3px solid var(--plum);
+  /* Palet krem-pastel (kombinasi sebelumnya) */
+  --plum: #2b2230;
+  --ivory: #FFF7DD;
+  --ivory-light: #FFFDF6;
+  --amber: #FFE5A1;
+  --olive: #86DCCF;
+  --terra: #E66FB3;
+  --sand: #FFCBE0;
+  --ink: #2b2230;
+  --deep: #C94A8F;
+  --mint: #86DCCF;
+  --pink: #FFCBE0;
+  --magenta: #E66FB3;
+  --baby: #B5EAF2;
+  --butter: #FFE5A1;
+  --cream: #FFF7DD;
+  --paper: #FFFDF6;
+  --line: 3px solid var(--ink);
 
   /* Sistem 3D: highlight atas (timbul) + bayangan keras di kanan-bawah */
   --bevel: inset 0 3px 0 rgba(255,255,255,.7), inset 0 -4px 0 rgba(43,34,48,.12);
@@ -55,14 +55,14 @@ body {
   position: sticky; top: 0; z-index: 10;
   display: flex; justify-content: space-between; align-items: center;
   padding: 12px 16px;
-  background: var(--amber);
+  background: #F59BC3;
   border-bottom: var(--line);
   box-shadow: 0 4px 0 var(--ink);
 }
 .brand-name {
   font-family: "Pretty on the Inside", "Arial Narrow", cursive;
-  font-weight: 400; font-size: 32px; color: var(--plum);
-  text-shadow: 2px 2px 0 var(--ivory-light);
+  font-weight: 400; font-size: 32px; color: #fff;
+  text-shadow: 2px 2px 0 var(--ink);
 }
 .iconbtn {
   position: relative; border: var(--line); background: var(--paper);
@@ -82,7 +82,7 @@ body {
 /* ===== Halaman depan ===== */
 .home { max-width: 760px; margin: 0 auto; padding: 22px 16px 36px; }
 .hero {
-  background-color: var(--ivory-light);
+  background-color: #FFF1A8;
   background-image:
     linear-gradient(rgba(255,255,255,.75) 2px, transparent 2px),
     linear-gradient(90deg, rgba(255,255,255,.75) 2px, transparent 2px);
@@ -132,7 +132,7 @@ body {
 .menu-title {
   display: block; width: fit-content; margin: 0 auto 18px;
   font-family: "Pretty on the Inside", "Arial Narrow", cursive;
-  font-weight: 400; font-size: 34px;
+  font-weight: 400; font-size: 24px;
   background: var(--paper); border: var(--line); border-radius: 999px;
   padding: 2px 22px; box-shadow: var(--bevel), var(--lift-sm);
 }
@@ -156,8 +156,8 @@ body {
   border: 2px solid var(--ink); border-radius: 12px; background: var(--paper);
   box-shadow: var(--lift-sm);
 }
-.menu-card b { display: block; font-size: 24px; }
-.menu-card small { display: block; font-size: 16px; font-weight: 400; }
+.menu-card b { display: block; font-size: 17px; }
+.menu-card small { display: block; font-size: 13px; font-weight: 400; }
 .menu-card .arrow {
   margin-left: auto; flex-shrink: 0;
   width: 46px; height: 46px; border-radius: 50%;
@@ -173,10 +173,10 @@ body {
 }
 .contact-card h2 {
   margin: 0 0 6px; font-family: "Pretty on the Inside", "Arial Narrow", cursive;
-  font-weight: 400; font-size: 34px; color: var(--magenta);
+  font-weight: 400; font-size: 24px; color: var(--magenta);
   text-shadow: 2px 2px 0 #fff;
 }
-.contact-card p { font-weight: 400; margin: 0 0 16px; font-size: 17px; }
+.contact-card p { font-weight: 400; margin: 0 0 16px; font-size: 14px; }
 .contact-actions { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; }
 footer { text-align: center; padding: 24px 12px 10px; font-size: 14px; }
 
@@ -184,7 +184,7 @@ footer { text-align: center; padding: 24px 12px 10px; font-size: 14px; }
 .page { max-width: 1000px; margin: 0 auto; padding: 18px 16px 60px; }
 .page-title {
   font-family: "Pretty on the Inside", "Arial Narrow", cursive;
-  font-weight: 400; font-size: 46px; line-height: 1.05;
+  font-weight: 400; font-size: 30px; line-height: 1.05;
   color: var(--magenta); margin: 10px 0 20px;
   text-shadow: 2px 2px 0 #fff, 4px 4px 0 var(--ink);
 }
@@ -209,7 +209,7 @@ footer { text-align: center; padding: 24px 12px 10px; font-size: 14px; }
 .group-title {
   display: inline-block; margin: 0 0 18px;
   font-family: "Pretty on the Inside", "Arial Narrow", cursive; font-weight: 400;
-  font-size: 30px; background: var(--butter); color: var(--ink);
+  font-size: 20px; background: var(--butter); color: var(--ink);
   border: var(--line); border-radius: 999px; padding: 4px 22px;
   box-shadow: var(--bevel), var(--lift-md);
 }
@@ -248,14 +248,14 @@ footer { text-align: center; padding: 24px 12px 10px; font-size: 14px; }
   border: 2px solid var(--ink); border-radius: 999px; padding: 1px 10px;
   background: var(--paper); display: inline-block;
 }
-.card h3 { font-size: 24px; margin: 10px 0 6px; }
-.desc { font-size: 15px; font-weight: 400; margin: 0 0 10px; }
+.card h3 { font-size: 17px; margin: 10px 0 6px; }
+.desc { font-size: 13px; font-weight: 400; margin: 0 0 10px; }
 .card-foot {
   display: flex; justify-content: space-between; align-items: flex-end;
   border-top: 3px solid var(--ink); padding-top: 12px; margin-top: 4px;
 }
 .card-foot small { font-family: monospace; font-weight: 400; color: #6b5a6e; }
-.price { font-size: 24px; color: var(--magenta); text-shadow: 1px 1px 0 var(--ink); }
+.price { font-size: 17px; color: var(--magenta); text-shadow: 1px 1px 0 var(--ink); }
 .add {
   width: 52px; height: 52px; border-radius: 50%;
   border: var(--line); background: var(--butter);
@@ -272,7 +272,7 @@ footer { text-align: center; padding: 24px 12px 10px; font-size: 14px; }
   border: var(--line); border-radius: 22px; padding: 20px 22px;
   box-shadow: var(--bevel), var(--accent); margin-bottom: 22px;
 }
-.note p { margin: 0; font-size: 19px; line-height: 1.5; font-weight: 400; white-space: pre-line; }
+.note p { margin: 0; font-size: 14px; line-height: 1.5; font-weight: 400; white-space: pre-line; }
 
 /* ===== Proof of Trust (galeri) ===== */
 .gallery { columns: 240px; column-gap: 20px; }
@@ -372,7 +372,7 @@ footer { text-align: center; padding: 24px 12px 10px; font-size: 14px; }
 }
 .tagline {
   font-family: monospace; font-size: 16px; letter-spacing: 2px; font-weight: 700;
-  color: var(--terra); margin: 4px 0 16px;
+  color: #1f7a6e; margin: 4px 0 16px;
 }
 .welcome-box {
   background: #fff; border: var(--line); border-radius: 18px;
@@ -388,12 +388,12 @@ footer { text-align: center; padding: 24px 12px 10px; font-size: 14px; }
 }
 .notes-title {
   font-family: "Pretty on the Inside", "Arial Narrow", cursive; font-weight: 400;
-  font-size: 38px; line-height: 1.1; color: var(--magenta);
+  font-size: 26px; line-height: 1.1; color: var(--magenta);
   margin: 12px 0 18px; text-shadow: 2px 2px 0 #fff;
 }
-.note-title { font-size: 22px; margin: 0 0 6px; color: var(--ink); }
+.note-title { font-size: 16px; margin: 0 0 6px; color: var(--ink); }
 .notes-section .note:last-child { margin-bottom: 0; }
-.lead { font-size: 17px; font-weight: 400; margin: 0 0 12px; }
+.lead { font-size: 14px; font-weight: 400; margin: 0 0 12px; }
 .count {
   display: inline-block; font-family: monospace; font-size: 14px; margin: 0 0 14px;
   background: var(--butter); border: 2px solid var(--ink); border-radius: 999px;
@@ -447,12 +447,12 @@ footer { text-align: center; padding: 24px 12px 10px; font-size: 14px; }
   padding: 6px 14px; font: inherit; font-size: 14px; color: var(--plum); cursor: pointer;
   box-shadow: 3px 3px 0 var(--plum);
 }
-.intro-kicker { font-family: monospace; font-size: 13px; letter-spacing: 3px; margin: 0; color: var(--terra); }
+.intro-kicker { font-family: monospace; font-size: 11px; letter-spacing: 3px; margin: 0; color: var(--terra); }
 .intro-title {
-  font-size: 26px; line-height: 1.15; text-align: center; margin: 0 0 4px;
+  font-size: 20px; line-height: 1.2; text-align: center; margin: 0 0 4px;
   color: var(--plum); max-width: 420px;
 }
-.stage { position: relative; width: min(320px, 90vw); height: 230px; }
+.stage { position: relative; width: min(260px, 78vw); height: 190px; }
 .envelope { position: absolute; inset: 0; cursor: pointer; outline: none; transition: opacity .6s ease; }
 .envelope:focus-visible { outline: 3px dashed var(--terra); outline-offset: 6px; }
 .env-body {
@@ -502,12 +502,12 @@ footer { text-align: center; padding: 24px 12px 10px; font-size: 14px; }
 }
 .idcard {
   position: absolute; left: 50%; top: 50%; z-index: 7;
-  width: min(290px, 86vw); pointer-events: none;
+  width: min(240px, 80vw); pointer-events: none;
   opacity: 0; transform: translate(-50%, -30%) scale(.85) rotate(-2deg);
   transition: opacity .6s ease, transform .9s cubic-bezier(.2, .9, .3, 1.15);
 }
 .show-card .idcard { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(-2deg); }
-.tap-btn { font-size: 18px; padding: 12px 30px; letter-spacing: 1px; margin-top: 6px; }
+.tap-btn { font-size: 15px; padding: 10px 24px; letter-spacing: 1px; margin-top: 6px; }
 
 /* ID Card Toko Hazze (dekoratif, bukan kartu resmi) */
 .id-card {
@@ -521,14 +521,14 @@ footer { text-align: center; padding: 24px 12px 10px; font-size: 14px; }
   background: var(--amber); border-bottom: 3px solid var(--plum);
   padding: 6px 14px; font-family: monospace; font-size: 11px; letter-spacing: 2px; font-weight: 700;
 }
-.id-body { display: grid; grid-template-columns: 92px 1fr; gap: 14px; align-items: center; padding: 14px 16px 10px; }
+.id-body { display: grid; grid-template-columns: 70px 1fr; gap: 14px; align-items: center; padding: 14px 16px 10px; }
 .id-photo img {
-  display: block; width: 92px; height: 92px; border-radius: 50%; object-fit: cover;
+  display: block; width: 70px; height: 70px; border-radius: 50%; object-fit: cover;
   border: 3px solid var(--plum); background: var(--sand); box-shadow: 3px 3px 0 var(--terra);
 }
 .id-brand {
   font-family: "Pretty on the Inside", "Arial Narrow", cursive; font-weight: 400;
-  font-size: 34px; line-height: 1; margin: 0 0 6px; color: var(--plum);
+  font-size: 24px; line-height: 1; margin: 0 0 6px; color: var(--plum);
   text-shadow: 2px 2px 0 #fff;
 }
 .id-tag { font-family: monospace; font-size: 12px; letter-spacing: 1px; color: var(--terra); margin: 0 0 6px; font-weight: 700; }
@@ -540,16 +540,15 @@ footer { text-align: center; padding: 24px 12px 10px; font-size: 14px; }
 
 /* Hero: ID Card, judul, dan deskripsi */
 .hero .id-card { max-width: 380px; margin: 0 auto 22px; }
-.welcome-title { font-size: 30px; line-height: 1.2; margin: 6px 0 8px; color: var(--plum); }
+.welcome-title { font-size: 22px; line-height: 1.2; margin: 6px 0 8px; color: var(--plum); }
 .welcome-title span {
   font-family: "Pretty on the Inside", "Arial Narrow", cursive; font-weight: 400;
   color: var(--terra); text-shadow: 2px 2px 0 #fff;
 }
-.welcome { font-size: 18px; line-height: 1.5; font-weight: 400; max-width: 520px; margin: 0 auto 16px; }
+.welcome { font-size: 16px; line-height: 1.5; font-weight: 400; max-width: 520px; margin: 0 auto 16px; }
 
 /* Menu: kartu terpisah dengan warna palet baru */
-.menu-card:nth-child(3) { background: var(--olive); }
-.menu-card:nth-child(4) { background: var(--amber); }
+.menu-card:nth-child(4) { background: var(--mint); }
 button.menu-card { width: 100%; font: inherit; text-align: left; cursor: pointer; }
 
 /* Little Notes: kertas bergaris */
@@ -616,8 +615,8 @@ h2.title {
 @media (max-width: 600px) {
   .sign { font-size: 44px; }
   .brand-name { font-size: 26px; }
-  .page-title { font-size: 36px; }
-  .menu-title { font-size: 28px; }
+  .page-title { font-size: 24px; }
+  .menu-title { font-size: 20px; }
   .hero, .menu-section { padding-left: 14px; padding-right: 14px; }
 }
 @media (prefers-reduced-motion: reduce) {
