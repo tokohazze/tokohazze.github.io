@@ -24,7 +24,7 @@
   --lift-sm: 3px 3px 0 var(--ink);
   --lift-md: 6px 6px 0 var(--ink);
   --lift-lg: 9px 9px 0 var(--ink);
-  --accent: 6px 6px 0 var(--deep);
+  --accent: 6px 6px 0 var(--ink);
   --ease: transform .15s ease, box-shadow .15s ease;
 }
 
@@ -148,8 +148,8 @@ body {
 }
 .menu-card:nth-child(2) { background: var(--paper); }
 .menu-card:nth-child(3) { background: var(--butter); }
-.menu-card:hover { transform: translate(-2px,-2px); box-shadow: var(--bevel), 8px 8px 0 var(--deep); }
-.menu-card:active { transform: translate(4px,4px); box-shadow: var(--bevel), 2px 2px 0 var(--deep); }
+.menu-card:hover { transform: translate(-2px,-2px); box-shadow: var(--bevel), 8px 8px 0 var(--ink); }
+.menu-card:active { transform: translate(4px,4px); box-shadow: var(--bevel), 2px 2px 0 var(--ink); }
 .menu-card .num {
   font-family: monospace; font-size: 16px; color: var(--ink); min-width: 42px;
   height: 42px; display: grid; place-items: center;
@@ -220,7 +220,7 @@ footer { text-align: center; padding: 24px 12px 10px; font-size: 14px; }
   box-shadow: var(--bevel), var(--accent);
   transition: var(--ease);
 }
-.card:not(.unavailable):hover { transform: translate(-2px,-2px); box-shadow: var(--bevel), 8px 8px 0 var(--deep); }
+.card:not(.unavailable):hover { transform: translate(-2px,-2px); box-shadow: var(--bevel), 8px 8px 0 var(--ink); }
 .card.unavailable { opacity: .6; box-shadow: var(--bevel), var(--lift-md); }
 .card-top {
   position: relative; height: 190px;
@@ -300,7 +300,7 @@ footer { text-align: center; padding: 24px 12px 10px; font-size: 14px; }
   box-shadow: var(--bevel), var(--accent); cursor: zoom-in;
   transition: var(--ease);
 }
-.shot:hover { transform: translate(-2px,-2px); box-shadow: var(--bevel), 8px 8px 0 var(--deep); }
+.shot:hover { transform: translate(-2px,-2px); box-shadow: var(--bevel), 8px 8px 0 var(--ink); }
 .shot img { width: 100%; display: block; border-bottom: 3px solid var(--ink); }
 .shot .num {
   position: absolute; left: 10px; bottom: 12px;
@@ -332,7 +332,7 @@ footer { text-align: center; padding: 24px 12px 10px; font-size: 14px; }
 .lightbox img {
   max-width: 95vw; max-height: 90vh;
   border: 4px solid #fff; border-radius: 16px;
-  box-shadow: 8px 8px 0 var(--deep);
+  box-shadow: 8px 8px 0 var(--ink);
 }
 
 /* ===== Keranjang ===== */
